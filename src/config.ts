@@ -5,7 +5,7 @@ export const myDataSource = new DataSource({
   host: "localhost",
   port: 3306,
   username: "root",
-  password: "1325476980",
+  password: "",
   database: "express-app",
   entities: ["__dirname + '/../**/*.entity.js"],
   logging: true,
