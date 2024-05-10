@@ -24,4 +24,32 @@ export class AuthController {
       console.error(error);
     }
   }
+
+  static async signIn(req: any, res: any) {
+    const { email, password } = req.body;
+
+    const user = await myDataSource
+      .getRepository(UserEntity)
+      .findOne({ where: { email } });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Email or password is incorrect" });
+    }
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const token = JwtController.createToken(user.email);
+
+      try {
+        res.send({
+          access_token: token?.accessToken,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      return res.status(400).json({ message: "Password is incorrect" });
+    }
+  }
 }

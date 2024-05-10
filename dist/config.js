@@ -7,6 +7,6 @@ export const myDataSource = new DataSource({
     password: "1325476980",
     database: "express-app",
     entities: ["__dirname + '/../**/*.entity.js"],
-    logging: true,
+    logging: false,
     synchronize: true,
 });

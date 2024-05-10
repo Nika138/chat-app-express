@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { UserEntity } from "../models/user.entity.js";
+import { JwtController } from "./jwt.controller.js";
 import bcrypt from "bcrypt";
 import { myDataSource } from "../config.js";
 export class AuthController {
@@ -22,11 +23,38 @@ export class AuthController {
                 password: hashedPassword,
             });
             try {
-                // await myDataSource.getRepository(UserEntity).save(user);
+                yield myDataSource.getRepository(UserEntity).save(user);
                 res.send(user);
             }
             catch (error) {
                 console.error(error);
+            }
+        });
+    }
+    static signIn(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, password } = req.body;
+            const user = yield myDataSource
+                .getRepository(UserEntity)
+                .findOne({ where: { email } });
+            if (!user) {
+                return res
+                    .status(400)
+                    .json({ message: "Email or password is incorrect" });
+            }
+            if (user && (yield bcrypt.compare(password, user.password))) {
+                const token = JwtController.createToken(user.email);
+                try {
+                    res.send({
+                        access_token: token === null || token === void 0 ? void 0 : token.accessToken,
+                    });
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            }
+            else {
+                return res.status(400).json({ message: "Password is incorrect" });
             }
         });
     }
