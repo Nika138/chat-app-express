@@ -23,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.post("/signup", AuthController.signUp);
 app.post("/signin", AuthController.signIn);
+app.post("/forgot-password", AuthController.forgotPassword);
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

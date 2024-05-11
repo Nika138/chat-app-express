@@ -52,4 +52,32 @@ export class AuthController {
       return res.status(400).json({ message: "Password is incorrect" });
     }
   }
+
+  static async forgotPassword(req: any, res: any) {
+    const { email, new_password } = req.body;
+
+    const user = await myDataSource
+      .getRepository(UserEntity)
+      .findOne({ where: { email: email } });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "User with that email doesn't exist" });
+    }
+
+    if (user) {
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash(new_password, salt);
+
+      user.password = hashedPassword;
+
+      try {
+        await myDataSource.getRepository(UserEntity).save(user);
+        res.send("Password changed successfully");
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
 }

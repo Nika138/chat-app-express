@@ -58,4 +58,29 @@ export class AuthController {
             }
         });
     }
+    static forgotPassword(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, new_password } = req.body;
+            const user = yield myDataSource
+                .getRepository(UserEntity)
+                .findOne({ where: { email: email } });
+            if (!user) {
+                return res
+                    .status(400)
+                    .json({ message: "User with that email doesn't exist" });
+            }
+            if (user) {
+                const salt = yield bcrypt.genSalt();
+                const hashedPassword = yield bcrypt.hash(new_password, salt);
+                user.password = hashedPassword;
+                try {
+                    yield myDataSource.getRepository(UserEntity).save(user);
+                    res.send("Password changed successfully");
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            }
+        });
+    }
 }
