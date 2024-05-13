@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from "express";
 import { myDataSource } from "./config.js";
 import { AuthController } from "./controllers/auth.controller.js";
 import { configDotenv } from "dotenv";
+import path from "path";
 
 configDotenv();
 
@@ -20,6 +21,26 @@ const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(process.cwd(), "src/views")));
+
+app.get("/", (req: Request, res: Response) => {
+  res.sendFile("home/home.html", {
+    root: path.join(process.cwd(), "src/views"),
+  });
+});
+
+app.get("/signup", (req: Request, res: Response) => {
+  res.sendFile("signup/signup.html", {
+    root: path.join(process.cwd(), "src/views"),
+  });
+});
+
+app.get("/login", (req: Request, res: Response) => {
+  res.sendFile("login/login.html", {
+    root: path.join(process.cwd(), "src/views"),
+  });
+});
 
 app.post("/signup", AuthController.signUp);
 app.post("/signin", AuthController.signIn);
