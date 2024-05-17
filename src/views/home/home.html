@@ -78,16 +78,15 @@
         window.location.href = "http://localhost:3000/signup";
       }
 
-      const socket = new WebSocket("ws://localhost:3000");
+      ws = new WebSocket("ws://localhost:3001");
 
-      socket.addEventListener("open", function (event) {
-        console.log("Connected to WS Server");
-        socket.send("Hello Server!");
+      ws.addEventListener("error", () => {});
+
+      ws.addEventListener("open", () => {
+        console.log("connected");
       });
 
-      socket.addEventListener("message", function (event) {
-        console.log("Message from server:", event.data);
-      });
+      ws.addEventListener("close", () => {});
 
       setTimeout(() => {
         localStorage.clear();

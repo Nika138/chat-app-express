@@ -4,7 +4,7 @@ import { AuthController } from "./controllers/auth.controller.js";
 import { configDotenv } from "dotenv";
 import path from "path";
 import http from "http";
-import { WebSocket, WebSocketServer } from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 import cors from "cors";
 
 configDotenv();
@@ -20,7 +20,7 @@ myDataSource
 
 const app: Express = express();
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server: server });
+const wss = new WebSocketServer({ port: 3001 });
 
 const port = 3000;
 
@@ -59,19 +59,21 @@ wss.on("connection", function connection(ws) {
   ws.on("close", function close() {
     console.log("Client disconnected");
   });
+
+  ws.on("error", function (error) {
+    console.error("WebSocket error:", error);
+  });
 });
 
 wss.on("error", function (error) {
   console.error("WebSocket server error:", error);
 });
 
-server.on("upgrade", function (request, socket, head) {
-  wss.handleUpgrade(request, socket, head, function (ws) {
-    wss.emit("connection", ws, request);
-  });
-});
-
-console.log("WebSocket server is running");
+// server.on("upgrade", function (request, socket, head) {
+//   wss.handleUpgrade(request, socket, head, function (ws) {
+//     wss.emit("connection", ws, request);
+//   });
+// });
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
