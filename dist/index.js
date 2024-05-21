@@ -4,7 +4,7 @@ import { AuthController } from "./controllers/auth.controller.js";
 import { configDotenv } from "dotenv";
 import path from "path";
 import http from "http";
-import { WebSocketServer } from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 import cors from "cors";
 configDotenv();
 myDataSource
@@ -42,8 +42,15 @@ app.post("/signup", AuthController.signUp);
 app.post("/signin", AuthController.signIn);
 app.post("/forgot-password", AuthController.forgotPassword);
 wss.on("connection", function connection(ws) {
-    console.log("Client connected");
-    ws.send("Welcome");
+    ws.on("message", (message) => {
+        const messageText = message.toString();
+        wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(messageText);
+            }
+        });
+        ws.send(`You: ${messageText}`);
+    });
     ws.on("close", function close() {
         console.log("Client disconnected");
     });
@@ -54,11 +61,6 @@ wss.on("connection", function connection(ws) {
 wss.on("error", function (error) {
     console.error("WebSocket server error:", error);
 });
-// server.on("upgrade", function (request, socket, head) {
-//   wss.handleUpgrade(request, socket, head, function (ws) {
-//     wss.emit("connection", ws, request);
-//   });
-// });
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });

@@ -53,8 +53,17 @@ app.post("/signin", AuthController.signIn);
 app.post("/forgot-password", AuthController.forgotPassword);
 
 wss.on("connection", function connection(ws) {
-  console.log("Client connected");
-  ws.send("Welcome");
+  ws.on("message", (message: Buffer) => {
+    const messageText = message.toString();
+
+    wss.clients.forEach((client) => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(messageText);
+      }
+    });
+
+    ws.send(`You: ${messageText}`);
+  });
 
   ws.on("close", function close() {
     console.log("Client disconnected");
@@ -68,12 +77,6 @@ wss.on("connection", function connection(ws) {
 wss.on("error", function (error) {
   console.error("WebSocket server error:", error);
 });
-
-// server.on("upgrade", function (request, socket, head) {
-//   wss.handleUpgrade(request, socket, head, function (ws) {
-//     wss.emit("connection", ws, request);
-//   });
-// });
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
