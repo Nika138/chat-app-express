@@ -46,6 +46,10 @@
 
       #welcome {
         margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
       }
 
       .chat-container {
@@ -137,10 +141,15 @@
         outline: none;
         margin-left: 10px;
       }
+
+      #logout {
+        background-color: #4caf50;
+        color: white;
+      }
     </style>
   </head>
-  <body>
-    <div id="container">
+  <body style="flex-direction: column;">
+    <div id="container" style="margin-bottom: 40px;"> 
       <div id="welcome"></div>
       <div id="buttons"></div>
 
@@ -155,9 +164,11 @@
             placeholder="Type your message..."
           />
           <button class="send-btn">Send</button>
-        </div>
-      </div>
+        </div> 
     </div>
+    <div id="logout" ></div>
+    
+      
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -166,10 +177,12 @@
         const buttonsDiv = document.getElementById("buttons");
         const chatContainer = document.getElementById("chat-container");
         const mainContainer = document.getElementById("container");
+        const logoutDiv = document.getElementById("logout")
 
         if (accessToken) {
           chatContainer.style.display = "block";
           mainContainer.style.justifyContent = "flex-start";
+          logoutDiv.innerHTML = `<button class="button login" onclick="logOut()">Logout</button>`
         } else {
           welcomeDiv.innerHTML =
             "<h1>Welcome</h1><p>You are not logged in.</p>";
@@ -217,7 +230,12 @@
       localStorage.clear();
       window.location.reload();
     }, 3600000);
+  
 
+  function logOut() {
+    localStorage.clear();
+    window.location.reload();
+  }
 
   function redirectToLogin() {
     window.location.href = "http://localhost:3000/login";
